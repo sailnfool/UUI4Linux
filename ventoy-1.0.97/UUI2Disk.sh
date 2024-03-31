@@ -6,6 +6,23 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
+#  Universal USB Installer Copyright https://pendrivelinux.com
+#  Updates by Robert E. Novak aka REN
+#  sailnfool@gmail.com
+#  Cebu, Philippines
+#_____________________________________________________________________
+# Rev.|Aut| Date     | Notes
+#_____________________________________________________________________
+# 1.0 |REN|03/30/2024| Update by Robert E. Novak
+#                    | Added directions on how to re-do the initial
+#                    | installation of the package
+#                    | moved the logfile into /tmp (to avoid permission
+#                    | trouble.  Gave the logfile a distinctive name
+#                    | that identifies the creating script, date and
+#                    | time of the logfile.
+#_____________________________________________________________________
+#
+
 OLDDIR=$(pwd)
 
 if ! [ -f ./tool/ventoy_lib.sh ]; then
@@ -29,33 +46,46 @@ else
 fi
 export PATH="./tool/$TOOLDIR:$PATH"
 
-echo " The following packages will be installed:"
-echo " UUI files with Ventoy Bootloader: $curver  $TOOLDIR"
-echo "*************************************************"
-echo ""
+logger=/tmp/${0##*/}_$(date '+%F%R')_$$_log.txt
+echo "log is found in ${logger}" | tee -a ${logger}
+
+echo " The following packages will be installed:" | tee -a ${logger}
+echo " UUI files with Ventoy Bootloader: $curver  $TOOLDIR" | tee -a ${logger}
+echo "*************************************************" | tee -a ${logger}
+echo "" | tee -a ${logger}
 
 if ! [ -f ./boot/boot.img ]; then
     if [ -d ./grub ]; then
-        echo "Don't run this script here, please download the released install package, and run the script in it."
+        echo "Don't run this script here,"
+	echo "please download the released install package,"
+	echo "and run the script in it."
+	echo "As of March 30, 2024 perform the following steps:"
+	echo "cd ~/Desktop"
+	echo "wget https://pendrivelinux.com/downloads/UUI4Linux.tar.gz"
+	echo "tar xzvf UUI4Linux.tar.gz"
+	echo "cd UUI4Linux"
+	echo "chmod +x UUI.sh && ./UUI.sh"
     else
         echo "Please run under the correct directory!" 
     fi
     exit 1
 fi
 
-echo "############# $* [$TOOLDIR] ################" >> ./log.txt
-date >> ./log.txt
+whoami | tee -a ${logger}
+echo "############# $* [$TOOLDIR] ################" | tee -a ${logger}
+date |tee -a ${logger}
 
 #decompress tool
-echo "decompress tools" >> ./log.txt
+echo "decompress tools" |tee -a ${logger}
 cd ./tool/$TOOLDIR
 
 ls *.xz > /dev/null 2>&1
 if [ $? -eq 0 ]; then
+    # The following is dangerous!
     [ -f ./xzcat ] && chmod +x ./xzcat
 
     for file in $(ls *.xz); do
-        echo "decompress $file" >> ./log.txt
+        echo "decompress $file" |tee -a ${logger}
         xzcat $file > ${file%.xz}
         [ -f ./${file%.xz} ] && chmod +x ./${file%.xz}
         [ -f ./$file ] && rm -f ./$file
