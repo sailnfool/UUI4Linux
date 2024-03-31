@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#  Universal USB Installer is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  any later version.
+#  Universal USB Installer is free software: you can redistribute
+#  it and/or modify it under the terms of the GNU General Public
+#  License as published by the Free Software Foundation, either
+#  version 2 of the License, or any later version.
 
 #  It is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,10 +11,21 @@
 #  GNU General Public License for more details.
 
 #  You should have received a copy of the GNU General Public License
-#  along with this software. If not, see <https://www.gnu.org/licenses/>.
+#  along with this software. If not,
+#  see <https://www.gnu.org/licenses/>.
 
 #  Universal USB Installer Copyright https://pendrivelinux.com
-
+#  Updates by Robert E. Novak aka REN
+#  sailnfool@gmail.com
+#  Cebu, Philippines
+#_____________________________________________________________________
+# Rev.|Aut| Date     | Notes
+#_____________________________________________________________________
+# 1.0 |REN|03/30/2024| Initial Update by Robert E. Novak
+#                    | Fixed read choice to force to lower case
+#                    | Fixed Menu prompt to reflect that
+#_____________________________________________________________________
+#
 VENT_VER="ventoy-1.0.97"
 # . ./$VENT_VER/tool/ventoy_lib.sh
   echo -e '\0033\0143'
@@ -61,29 +72,43 @@ check_exfat_support() {
   fi
 }
 
+########################################################################
+# Fixed to allow upper/lower case input and document that
+########################################################################
+declare -l choice
+choice="a"
 # Function to refresh the list of devices
 refresh_devices() {
   echo "***************** UUI.sh for Linux ***********************"
   # echo ''
   echo "      Welcome to the UUI shell script for Linux."
   echo " This script is used to prepare a drive for use with UUI."
-  echo " To get started, find your USB device from the list below." 
+  echo " To get started, find your USB device from the list below."
+  echo " Input values are case insensitive."
   echo ''
-  echo "   Press the 'R' key to refresh devices. Redetects drives,"
-  echo "   'A' key to show all drives (WARNING! be cautious),"
-  echo "   'Q' key to quit the program, returns you to terminal." 
+  echo "   Press the 'r' key to refresh devices. Redetects drives,"
+  echo "   'a' key to show all drives (WARNING! be cautious),"
+  echo "   'q' key to quit the program, returns you to terminal."
   # echo ''
   echo "**********************************************************"
   echo ''
+
+########################################################################
+# The choice for the user is not set before it is used
+########################################################################
 
   devices=()
   sizes=()
   models=()
 
+
   # Use lsblk to list all drives
   while read -r device size model rm; do
     # Skip the header line
-    if [ "$device" == "NAME" ] && [ "$size" == "SIZE" ] && [ "$model" == "MODEL" ] && [ "$rm" == "RM" ]; then
+    # Note that this should never happen due to the '-n' option given
+    # to lsblk
+    if [ "$device" == "NAME" ] && [ "$size" == "SIZE" ] && \
+	    [ "$model" == "MODEL" ] && [ "$rm" == "RM" ]; then
       continue
     fi
 
@@ -172,7 +197,8 @@ while true; do
   case "$choice" in
     [1-9]*)
       selected_device_index="$((choice - 1))"
-      if [ "$selected_device_index" -ge 0 ] && [ "$selected_device_index" -lt "${#devices[@]}" ]; then
+      if [ "$selected_device_index" -ge 0 ] && \
+	      [ "$selected_device_index" -lt "${#devices[@]}" ]; then
         selected_device="${devices[$selected_device_index]}"
         install_ventoy "$selected_device"
         break
