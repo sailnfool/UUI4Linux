@@ -24,11 +24,14 @@
 # 1.0 |REN|03/30/2024| Initial Update by Robert E. Novak
 #                    | Fixed read choice to force to lower case
 #                    | Fixed Menu prompt to reflect that
+#                    | defined mnemonic name to ansi code for clearing
+#                    | the screen and put it in rentoy_lib.sh
 #_____________________________________________________________________
 #
 VENT_VER="ventoy-1.0.97"
 # . ./$VENT_VER/tool/ventoy_lib.sh
-  echo -e '\0033\0143'
+source ./${VENT_VER}/tool/rentoy_lib.sh
+  echo -e ${ansi_ClearScreen}
 
 # Declare arrays to store device names, sizes, and models
 declare -a devices
@@ -207,13 +210,13 @@ while true; do
       fi
       ;;
     r)
-      echo -e '\0033\0143'
+      echo -e ${ansi_ClearScreen}
       refresh_devices
       echo "Refreshed devices..."
       echo
       ;;
     a)
-      echo -e '\0033\0143'
+      echo -e ${ansi_ClearScreen}
       show_all=true
       refresh_devices
       echo "Showing all drives..."
